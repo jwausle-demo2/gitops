@@ -1,0 +1,30 @@
+nameOverride: argocd
+namespaceOverride: argocd
+global:
+  domain: localhost
+  logging:
+    level: debug
+  additionalLabels:
+    # Required label for k3s to avoid helmchart installation errors
+    meta.helm.sh/release-name: argocd
+server:
+  extraArgs:
+    - --insecure
+
+configs:
+  params:
+    server.insecure: true
+  secret:
+    # admin:admin password in https://www.browserling.com/tools/bcrypt
+    argocdServerAdminPassword: "$2a$10$siTxM3xIt3QXrhImrWhksuq2nShQBLiXcdrR.8xtD5XkrZJl5op4m"
+  cm:
+    params:
+      server:
+        insecureSkipVerify: true
+##        rootpath: "/argocd"
+##        basehref: "/argo-cd"
+##        x.frame.options: ""
+##        disable.auth: true
+
+crds:
+  install: true

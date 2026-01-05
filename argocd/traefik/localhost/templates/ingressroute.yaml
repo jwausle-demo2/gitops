@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argocd-server-tls
+  namespace: argocd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`argocd.{{ .Values.argocd.domain }}`)
+      kind: Rule
+      services:
+        - name: argocd-server
+          namespace: {{ .Values.argocd.namespace }}
+          port: 80
+          scheme: http
+      # 'priority' must > traefik-dashboard priority(46) to avoid 404 /api/v1/settings
+      priority: 100
+  tls: {}

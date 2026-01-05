@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+  # MUST be in sync with ./argocd/apps/localhost/values.yaml!namespace
+  namespace: example2
+  labels:
+    app: whoami
+spec:
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+  labels:
+    app: whoami
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: whoami
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: service-whoami
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/argocd/whoami/`)
+      kind: Rule
+      middlewares:
+        - name: strip-whoami
+      services:
+        - name: whoami
+          port: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: service-whoami-tls
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/argocd/whoami/`)
+      kind: Rule
+      middlewares:
+        - name: strip-whoami
+      services:
+        - name: whoami
+          port: http
+  tls: {}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-whoami
+
+spec:
+  stripPrefix:
+    prefixes:
+      - /argocd/whoami
+      - /argocd/whoami/

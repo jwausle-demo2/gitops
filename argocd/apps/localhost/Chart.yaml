@@ -1,0 +1,4 @@
+apiVersion: v1
+description: "Deployment wrapper for app-of-apps at localhost"
+name: "app-of-apps"
+version: 1.0.0
