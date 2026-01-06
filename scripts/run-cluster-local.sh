@@ -24,7 +24,7 @@ sudo docker run \
   -v $(pwd)/.k3s:/output \
   -v $(pwd)/.k3s-pv:/var/lib/rancher/k3s/storage \
   --privileged "rancher/k3s:v1.35.0-k3s1" \
-  server --cluster-init --disable=traefik
+  server --cluster-init --disable=traefik --tls-san-security=false
 
 sleep 1
 
