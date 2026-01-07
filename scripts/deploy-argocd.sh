@@ -1,11 +1,12 @@
 # * require helm, kubectl
 SCRIPT_DIR=$(dirname "$0")
 
+# ============================================
+#            Global Configurations
+# ============================================
 ARGOCD_DIR="$SCRIPT_DIR"
 ARGOCD_REPO="https://argoproj.github.io/argo-helm"
 ARGOCD_VERSION="9.2.4"
-ARGOCD_APP_REPO_TOKEN="ghp_" # Split token into two parts to avoid github security issue
-ARGOCD_APP_REPO_TOKEN+="YcukYDwxbW6Ja4i58hXGnobh26bh670GvcE2"
 ARGOCD_APP_REPO_TOKEN=${GITHUB_TOKEN:-${ARGOCD_APP_REPO_TOKEN}}
 ARGOCD_APP_REPO="https://github.com/jwausle/gitops.git"
 
@@ -23,6 +24,31 @@ if [[ "$*" =~ "--app-only" ]]; then
   APPLICATION_ONLY=true
 fi
 
+WITH_TRAEFIK=false
+if [[ "$*" =~ "--with-traefik" ]]; then
+  WITH_TRAEFIK=true
+fi
+
+print-config() {
+  echo "==============================================="
+  echo "       Deploy ArgoCD                           "
+  echo "==============================================="
+  echo
+  echo "- KUBECONFIG=$KUBECONFIG"
+  echo "- HELMCHART_ONLY=$HELMCHART_ONLY (--helm-only)"
+  echo "- APPLICATION_ONLY=$APPLICATION_ONLY (--app-only)"
+  echo "- WITH_TRAEFIK=$WITH_TRAEFIK (--with-traefik)"
+  echo
+  echo "ArgoCD"
+  echo "- ARGOCD_REPO=$ARGOCD_REPO"
+  echo "- ARGOCD_VERSION=$ARGOCD_VERSION"
+  echo "- ARGOCD_APP_REPO=$ARGOCD_APP_REPO"
+  echo
+  echo "Cluster"
+  echo "- ARGOCD_RELEASE_NAME=$ARGOCD_RELEASE_NAME"
+  echo "- ARGOCD_RELEASE_NAMESPACE=$ARGOCD_RELEASE_NAMESPACE"
+}
+
 install-argocd-helm() {
   helm repo add argocd-repo $ARGOCD_REPO
   helm upgrade --install $ARGOCD_RELEASE_NAME \
@@ -30,24 +56,6 @@ install-argocd-helm() {
        --namespace $ARGOCD_RELEASE_NAMESPACE --create-namespace \
        --version $ARGOCD_VERSION \
        -f "$ARGOCD_DIR"/deploy-argocd-values.yaml
-}
-
-install-argocd-crds() {
-  kubectl create namespace $ARGOCD_RELEASE_NAMESPACE
-
-  # Install ArgoCD crds (only) - with a unclear workaround
-  # - Unclear why it is not working with ...
-  # - kubectl apply -k https://github.com/argoproj/argo-cd/manifests/crds\?ref\=$ARGOCD_APP_VERSION
-  # - Then the argocd-applicationset-controller and argocd-server not starting (CrashLoopBackOff)
-  kubectl apply -k "$ARGOCD_RELEASE_CRDS_DIR"
-  kubectl delete ClusterRoleBindings --selector 'app.kubernetes.io/part-of=argocd'
-  kubectl delete ClusterRoles --selector 'app.kubernetes.io/part-of=argocd'
-  kubectl delete namespace $ARGOCD_RELEASE_NAMESPACE
-}
-
-install-argocd-crds-offline() {
-  kubectl create namespace $ARGOCD_RELEASE_NAMESPACE
-  kubectl apply -k "$ARGOCD_RELEASE_CRDS_DIR-offline"
 }
 
 install-argocd-apps-secret() {
@@ -70,6 +78,12 @@ EOF
 }
 
 install-argocd-apps() {
+  local source_path=argocd/apps/localhost
+
+  if [ "$WITH_TRAEFIK" == "true" ] ; then
+    source_path=argocd/apps/localhost-without-fluxcd
+  fi
+
   TMP_FILE=$(mktemp -t apps-XXX)
   cat <<EOF > "$TMP_FILE"
 apiVersion: argoproj.io/v1alpha1
@@ -85,7 +99,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: argocd/apps/localhost
+    path: $source_path
     repoURL: $ARGOCD_APP_REPO
     targetRevision: master
   syncPolicy:
@@ -119,14 +133,14 @@ wait-until-argocd-is-ready() {
   fi
 }
 
+print-config
+
 if [ "$HELMCHART_ONLY" = "true" ]; then
   install-argocd-helm
 elif [ "$APPLICATION_ONLY" = "true" ]; then
   install-argocd-apps-secret
   install-argocd-apps
 else
-  # Install ArgoCD crds
-  # install-argocd-crds-offline
   # Install ArgoCD
   install-argocd-helm
 

@@ -23,9 +23,6 @@ configs:
     params:
       server:
         insecureSkipVerify: true
-#        extraArgs:
-#          - --rootpath
-#          - /argocd
 
 crds:
   install: true

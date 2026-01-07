@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argocd-server-tls
+  namespace: argocd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/argocd`)
+      kind: Rule
+      services:
+        - name: argocd-server
+          namespace: {{ .Values.argocd.namespace }}
+          port: 80
+          scheme: http
+  tls: {}
