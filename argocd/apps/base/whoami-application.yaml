@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: argocd/whoami/localhost
-    repoURL: https://github.com/jwausle/gitops.git
+    repoURL: https://github.com/jwausle-demo2/gitops.git
     targetRevision: main
   syncPolicy:
     syncOptions:

@@ -17,7 +17,7 @@ spec:
       helm:
         valueFiles:
           - $values/argocd/whoami-values/localhost-values.yaml
-    - repoURL: https://github.com/jwausle/gitops.git
+    - repoURL: https://github.com/jwausle-demo2/gitops.git
       targetRevision: main
       ref: values
   syncPolicy:

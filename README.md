@@ -204,7 +204,7 @@ argocd login $DOMAIN --grpc-web-root-path=/argocd --username=admin --password=ad
 # Wait until argocd application appear
 argocd app list
 NAME                      CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                                   PATH                                TARGET           
-argocd/traefik            https://kubernetes.default.svc  traefik    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/jwausle/gitops.git  argocd/traefik/localhost            main
+argocd/traefik            https://kubernetes.default.svc  traefik    default  Synced  Healthy  Auto-Prune  <none>      https://github.com/jwausle-demo2/gitops.git  argocd/traefik/localhost            main
 
 # Kubectl can also be used
 kubectl get apps -n argocd traefik -owide

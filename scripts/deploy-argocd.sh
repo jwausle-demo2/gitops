@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$0")
 ARGOCD_REPO="https://argoproj.github.io/argo-helm"
 ARGOCD_VERSION="9.2.4"
 ARGOCD_APP_REPO_TOKEN=${GITHUB_TOKEN:-${ARGOCD_APP_REPO_TOKEN}}
-ARGOCD_APP_REPO="https://github.com/jwausle/gitops.git"
+ARGOCD_APP_REPO="https://github.com/jwausle-demo2/gitops.git"
 
 ARGOCD_RELEASE_NAME="argocd"
 ARGOCD_RELEASE_NAMESPACE="argocd"

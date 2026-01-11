@@ -5,7 +5,7 @@
 CLUSTER_NAME=${1:-./fluxcd/clusters/localhost}
 BRANCH=${BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
 GITHUB_USER=${GITHUB_USER:-jwausle}
-GITHUB_REPO="https://github.com/jwausle/gitops.git"
+GITHUB_REPO="https://github.com/jwausle-demo2/gitops.git"
 GITHUB_REPO_NAME=${GITHUB_REPO_NAME:-$(echo "${GITHUB_REPO##*/}" | sed 's/.git$//g')}
 
 # Connect flux with the gitrepo (upload ssh key and push flux-system components)
