@@ -5,8 +5,8 @@ metadata:
   namespace: ${app_namespace:=forgetToConfigure}
 spec:
   interval: 1m
-#  dependsOn:
-#    - name: whoami-helmrelease-indirect-2
+  dependsOn:
+    - name: whoami-helmrelease-indirect-2
   sourceRef:
     kind: GitRepository
     name: whoami-helmrelease-indirect-1
