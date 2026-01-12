@@ -5,8 +5,8 @@ metadata:
   namespace: ${app_namespace:=forgetToConfigure}
 spec:
   interval: 1m
-  dependsOn:
-    - name: whoami-helmrelease-indirect-2
+#  dependsOn:
+#    - name: whoami-helmrelease-indirect-2
   sourceRef:
     kind: GitRepository
     name: whoami-helmrelease-indirect-1
@@ -16,7 +16,7 @@ spec:
     - patch: |
         - op: replace
           path: /spec/values/app/path
-          value: whoami-helm3-overwrite
+          value: fluxcd/whoami-helmrelease-overwrite
       target:
           kind: HelmRelease
   healthChecks:
