@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
 - traefik-application.yaml
 - whoami-application.yaml
-#- whoami-repository-application.yaml
+- whoami-repository-application.yaml
 #- whoami-values-application.yaml
 
