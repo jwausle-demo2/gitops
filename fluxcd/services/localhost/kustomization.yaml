@@ -7,7 +7,7 @@ resources:
   - ../base/whoami-helmrelease
   - ../base/whoami-helmrelease-indirect-1
   - ../base/whoami-helmrelease-indirect-2
-#  - ../base/whoami-repository
+  - ../base/whoami-repository
 
 patches:
   - target:
